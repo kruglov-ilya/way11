@@ -285,8 +285,8 @@ img {
     &__pic {
         position: absolute;
         z-index: -1;
-        bottom: -600px;
-        left: 500px;
+        bottom: -115px;
+        right: -225px;
         pointer-events: none;
     }
     &__adv {
@@ -378,9 +378,13 @@ img {
             justify-content: center;
             transform: skew(-18deg);
             border: 1px solid #438CB4;
+            transition: all 0.2s ease;
             &.w100 {
                 width: 100%;
                 margin-bottom: 24px;
+            }
+            &:hover {
+                border: 1px solid #5BB6F1;
             }
             input {
                 border: none;
@@ -546,16 +550,9 @@ img {
             left: 0px;
             bottom: 45px;
             transition: all 0.6s ease;
-            &.tr1 {
-                left: 300px;
+            &.tr {
                 .projects__road-wheel1, .projects__road-wheel2 {
-                    animation: wheel .7s linear;
-                }
-            }
-            &.tr2 {
-                left: 600px;
-                .projects__road-wheel1, .projects__road-wheel2 {
-                    animation: wheel .7s linear;
+                    animation: wheel .6s linear;
                 }
             }
         }

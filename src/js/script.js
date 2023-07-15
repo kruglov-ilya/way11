@@ -20,7 +20,6 @@ window.addEventListener('DOMContentLoaded', () => {
     burger?.addEventListener('click', () => {
         sideNav.classList.toggle('active');
         burger.classList.toggle('active');
-        // document.body.style.overflow = "hidden";
     })
 
 
@@ -32,107 +31,96 @@ window.addEventListener('DOMContentLoaded', () => {
     const projectsText1 = document.getElementById("tr1"); 
     const projectsText2 = document.getElementById("tr2"); 
     let marker = false;
-    // let markerTop = false;
-    let markerCount = 1;
 
     let projectsOffset = 1380;
+    const baseOffset = 280;
 
+    let bikePosition = 0;
+    let wheelAnimation = false;
 
     function disableScroll() {
-        // Get the current page scroll position
         let scrollTop = window.scrollY || document.documentElement.scrollTop;
         let scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-      
-            // if any scroll is attempted,
-            // set this to the previous value
-            window.onscroll = function() {
-                window.scrollTo(scrollLeft, scrollTop);
-            };
+    
+        window.onscroll = function(e) {
+            if (window.scrollY < scrollTop) {
+                if (bikePosition > 0) {
+                    bikePosition = bikePosition - 10;
+                }
+            } else if (window.scrollY > scrollTop) {
+                bikePosition = bikePosition + 10;
+            }
+            window.scrollTo(scrollLeft, scrollTop);
+        };
     }
       
     function enableScroll() {
         window.onscroll = function() {};
     }
 
+    let bottomMarker = false;
+
+
     function handleScroll(e) {
+
+        if (!wheelAnimation) {
+            bike.classList.add('tr');
+            wheelAnimation = true;
+        } else {
+            setTimeout(() => {
+                bike.classList.remove('tr');
+                wheelAnimation = false;
+            }, 600);
+        }
         
         var blockPosition = block.getBoundingClientRect();
-        console.log(blockPosition);
 
-        if ((blockPosition.top > -280) && !marker) {
+        if ((blockPosition.top > -baseOffset) && !marker) {
             disableScroll();
         } 
-        if ((blockPosition.top < -280)) {
+        if ((blockPosition.top < -baseOffset)) {
             marker = true;
         } 
 
-        if ((marker && markerCount == 1)) {
+        if (bottomMarker && (blockPosition.top < -baseOffset)) {
+            disableScroll();
+        } 
+
+        bike.style.transform = "translateX(" + (bikePosition) + "px)";  
+
+        if (bottomMarker && bikePosition < 10) {
+            enableScroll();
+            bottomMarker = false;
+            marker = false;
+        }
+        if (bikePosition == 0) {
+            projectsWrap.style.transform = "translateX(" + (0) + "px)";  
+            projectsWrapper.forEach(item => item.classList.remove("active"));
+            projectsWrapper[0].classList.add("active");   
+            projectsText1.classList.remove('active');
+            projectsText2.classList.remove('active');
+            projectsText0.classList.add('active');
+        }
+        if (bikePosition == 430) {
             projectsWrap.style.transform = "translateX(" + (-projectsOffset) + "px)";  
             projectsWrapper.forEach(item => item.classList.remove("active"));
             projectsWrapper[1].classList.add("active");   
-            bike.classList.remove('tr0');
-            bike.classList.remove('tr2');
-            bike.classList.add('tr1');
             projectsText0.classList.remove('active');
             projectsText2.classList.remove('active');
             projectsText1.classList.add('active');
-            setTimeout(() => {
-                markerCount = 2;
-                marker = false;
-            }, 600);
         }
-        if(marker && markerCount == 2) {
+        if (bikePosition == 820) {
             projectsWrap.style.transform = "translateX(" + (-projectsOffset * 2) + "px)";
             projectsWrapper.forEach(item => item.classList.remove("active"));
             projectsWrapper[2].classList.add("active");
-            bike.classList.remove('tr0');
-            bike.classList.remove('tr1');
-            bike.classList.add('tr2');
             projectsText0.classList.remove('active');
             projectsText1.classList.remove('active');
             projectsText2.classList.add('active');
-            setTimeout(() => {
-                markerCount = 3;
-                marker = false;
-            }, 600);
         }
-        if(markerCount == 3) {
+        if (!bottomMarker && bikePosition >= 820) {
             enableScroll();
+            bottomMarker = true;
         }
-
-
-        // if (blockPosition.top < -350) {
-        //     projectsWrap.style.transform = "translateX(" + (-projectsOffset * 2) + "px)";
-        //     projectsWrapper.forEach(item => item.classList.remove("active"));
-        //     projectsWrapper[2].classList.add("active");
-        //     bike.classList.remove('tr0');
-        //     bike.classList.remove('tr1');
-        //     bike.classList.add('tr2');
-        //     projectsText0.classList.remove('active');
-        //     projectsText1.classList.remove('active');
-        //     projectsText2.classList.add('active');
-        // } else if (blockPosition.top < -249) {
-        //     projectsWrap.style.transform = "translateX(" + (-projectsOffset) + "px)";  
-        //     projectsWrapper.forEach(item => item.classList.remove("active"));
-        //     projectsWrapper[1].classList.add("active");   
-        //     bike.classList.remove('tr0');
-        //     bike.classList.remove('tr2');
-        //     bike.classList.add('tr1');
-        //     projectsText0.classList.remove('active');
-        //     projectsText2.classList.remove('active');
-        //     projectsText1.classList.add('active');
-        // } 
-        // else {
-        //     projectsWrap.style.transform = "translateX(" + (0) + "px)";   
-        //     projectsWrapper.forEach(item => item.classList.remove("active"));
-        //     projectsWrapper[0].classList.add("active");
-        //     bike.classList.remove('tr1');
-        //     bike.classList.remove('tr2');
-        //     bike.classList.add('tr0');
-        //     projectsText2.classList.remove('active');
-        //     projectsText1.classList.remove('active');
-        //     projectsText0.classList.add('active');
-        // }
     }
 
     document.addEventListener("scroll", handleScroll);
