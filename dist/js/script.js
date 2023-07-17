@@ -43,6 +43,17 @@ window.addEventListener('DOMContentLoaded', () => {
         let scrollLeft = window.scrollX || document.documentElement.scrollLeft;
     
         window.onscroll = function(e) {
+
+            if (!wheelAnimation) {
+                bike.classList.add('tr');
+                wheelAnimation = true;
+            } else {
+                setTimeout(() => {
+                    bike.classList.remove('tr');
+                    wheelAnimation = false;
+                }, 600);
+            }
+
             if (window.scrollY < scrollTop) {
                 if (bikePosition > 0) {
                     bikePosition = bikePosition - 10;
@@ -62,16 +73,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
     function handleScroll(e) {
-
-        if (!wheelAnimation) {
-            bike.classList.add('tr');
-            wheelAnimation = true;
-        } else {
-            setTimeout(() => {
-                bike.classList.remove('tr');
-                wheelAnimation = false;
-            }, 600);
-        }
         
         var blockPosition = block.getBoundingClientRect();
 
@@ -86,7 +87,7 @@ window.addEventListener('DOMContentLoaded', () => {
             disableScroll();
         } 
 
-        bike.style.transform = "translateX(" + (bikePosition) + "px)";  
+        // bike.style.transform = "translateX(" + (bikePosition) + "px)";  
 
         if (bottomMarker && bikePosition < 10) {
             enableScroll();
@@ -95,29 +96,32 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         if (bikePosition == 0) {
             projectsWrap.style.transform = "translateX(" + (0) + "px)";  
+            bike.style.transform = "translateX(" + (0) + "px)";  
             projectsWrapper.forEach(item => item.classList.remove("active"));
             projectsWrapper[0].classList.add("active");   
             projectsText1.classList.remove('active');
             projectsText2.classList.remove('active');
             projectsText0.classList.add('active');
         }
-        if (bikePosition == 430) {
-            projectsWrap.style.transform = "translateX(" + (-projectsOffset) + "px)";  
+        if (bikePosition == 50) {
+            projectsWrap.style.transform = "translateX(" + (-projectsOffset) + "px)"; 
+            bike.style.transform = "translateX(" + (430) + "px)";   
             projectsWrapper.forEach(item => item.classList.remove("active"));
             projectsWrapper[1].classList.add("active");   
             projectsText0.classList.remove('active');
             projectsText2.classList.remove('active');
             projectsText1.classList.add('active');
         }
-        if (bikePosition == 820) {
+        if (bikePosition == 100) {
             projectsWrap.style.transform = "translateX(" + (-projectsOffset * 2) + "px)";
+            bike.style.transform = "translateX(" + (820) + "px)";  
             projectsWrapper.forEach(item => item.classList.remove("active"));
             projectsWrapper[2].classList.add("active");
             projectsText0.classList.remove('active');
             projectsText1.classList.remove('active');
             projectsText2.classList.add('active');
         }
-        if (!bottomMarker && bikePosition >= 820) {
+        if (!bottomMarker && bikePosition >= 100) {
             enableScroll();
             bottomMarker = true;
         }
