@@ -507,6 +507,8 @@ img {
     position: relative;
     margin-top: 250px;
     padding-bottom: 680px;
+    min-height: 800px;
+    height: 100vh;
     &__test {
         position: absolute;
         display: flex;
