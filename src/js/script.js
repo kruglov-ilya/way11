@@ -18,122 +18,92 @@ window.addEventListener("DOMContentLoaded", () => {
     burger.classList.toggle("active");
   });
 
-  const projectsWrap = document.querySelector(".projects__test");
-  const projectsWrapper = document.querySelectorAll(".projects__wrapper");
-  const block = document.getElementById("projects");
-  const bike = document.querySelector(".projects__road-bike");
-  const projectsText0 = document.getElementById("tr0");
-  const projectsText1 = document.getElementById("tr1");
-  const projectsText2 = document.getElementById("tr2");
-  let marker = false;
-
-  let projectsOffset = 1380;
-  const baseOffset = 230;
-
-  let bikePosition = 0;
-  let wheelAnimation = false;
-  function preventScroll(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  }
-
-  function disable() {
-    document.addEventListener("scroll", preventScroll);
-  }
-
-  function enable() {
-    document.removeEventListener("scroll", preventScroll);
-  }
-  function disableScroll() {
-    let scrollTop = window.scrollY || document.documentElement.scrollTop;
-    let scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-    window.onscroll = function (e) {
-      if (window.scrollY < scrollTop) {
-        if (bikePosition > 0) {
-          bikePosition -= 420;
-        }
-      } else if (window.scrollY > scrollTop) {
-        bikePosition += 420;
-      }
-      disable();
-      window.scrollTo(scrollLeft, scrollTop);
-      setTimeout(() => {
-        enable();
-      }, 800);
-    };
-  }
-
-  function enableScroll() {
-    window.onscroll = function () {};
-  }
-
-  let bottomMarker = false;
-
-  function handleScroll(e) {
-    let scrollTop = window.scrollY || document.documentElement.scrollTop;
-    let scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-    window.scrollTo(scrollLeft, scrollTop);
-    if (!wheelAnimation) {
-      bike.classList.add("tr");
-      wheelAnimation = true;
-    } else {
-      setTimeout(() => {
-        bike.classList.remove("tr");
-        wheelAnimation = false;
-      }, 600);
-    }
-
-    var blockPosition = block.getBoundingClientRect();
-
-    if (blockPosition.top > -baseOffset && !marker) {
-      disableScroll();
-    }
-    if (blockPosition.top < -baseOffset) {
-      marker = true;
-    }
-
-    if (bottomMarker && blockPosition.top < -baseOffset) {
-      disableScroll();
-    }
-
-    bike.style.transform = "translateX(" + bikePosition + "px)";
-    bike.style.transition = "all 1s ease-in";
-
-    if (bottomMarker && bikePosition < 10) {
-      enableScroll();
-      bottomMarker = false;
-      marker = false;
-    }
-    if (bikePosition == 0) {
-      projectsWrap.style.transform = "translateX(" + 0 + "px)";
-      projectsWrapper.forEach((item) => item.classList.remove("active"));
-      projectsWrapper[0].classList.add("active");
-      projectsText1.classList.remove("active");
-      projectsText2.classList.remove("active");
-      projectsText0.classList.add("active");
-    }
-    if (bikePosition == 420) {
-      projectsWrap.style.transform = "translateX(" + -projectsOffset + "px)";
-      projectsWrapper.forEach((item) => item.classList.remove("active"));
-      projectsWrapper[1].classList.add("active");
-      projectsText0.classList.remove("active");
-      projectsText2.classList.remove("active");
-      projectsText1.classList.add("active");
-    }
-    if (bikePosition == 840) {
-      projectsWrap.style.transform =
-        "translateX(" + -projectsOffset * 2 + "px)";
-      projectsWrapper.forEach((item) => item.classList.remove("active"));
-      projectsWrapper[2].classList.add("active");
-      projectsText0.classList.remove("active");
-      projectsText1.classList.remove("active");
-      projectsText2.classList.add("active");
-    }
-    if (!bottomMarker && bikePosition >= 840) {
-      enableScroll();
-      bottomMarker = true;
-    }
-  }
-  document.addEventListener("scroll", handleScroll);
+  onProjectsSectionHeadler();
 });
+
+function onProjectsSectionHeadler() {
+  const projectsSection = document.getElementById("projects");
+  const maxTopForBlock = 0;
+
+  let scrollActive = true;
+  let projectNumber = 0;
+  let delayState = false;
+
+  const { disableScroll, enableScroll } = getScrollControl();
+
+  document.addEventListener("scroll", (ev) => {
+    const distanceFromTop = projectsSection.getBoundingClientRect().top;
+    if (distanceFromTop < maxTopForBlock) {
+      if (scrollActive) {
+        scrollActive = false;
+        activeFixedScrollState();
+      }
+
+      if (!scrollActive && !delayState) {
+        projectNumber++;
+        console.log('Project number:', projectNumber)
+      }
+
+      console.log("YES! ", distanceFromTop);
+    }
+  });
+
+  function activeFixedScrollState() {
+    window.scrollTo(0, projectsSection.offsetTop);
+    disableScroll();
+    console.log("Scroll disabled!");
+  }
+}
+
+function getScrollControl() {
+  // left: 37, up: 38, right: 39, down: 40,
+  // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+  var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
+
+  function preventDefault(e) {
+    e.preventDefault();
+  }
+
+  function preventDefaultForScrollKeys(e) {
+    if (keys[e.keyCode]) {
+      preventDefault(e);
+      return false;
+    }
+  }
+
+  // modern Chrome requires { passive: false } when adding event
+  var supportsPassive = false;
+  try {
+    window.addEventListener(
+      "test",
+      null,
+      Object.defineProperty({}, "passive", {
+        get: function () {
+          supportsPassive = true;
+        },
+      })
+    );
+  } catch (e) {}
+
+  var wheelOpt = supportsPassive ? { passive: false } : false;
+  var wheelEvent =
+    "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
+
+  // call this to Disable
+  function disableScroll() {
+    window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
+    window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
+    window.addEventListener("touchmove", preventDefault, wheelOpt); // mobile
+    window.addEventListener("keydown", preventDefaultForScrollKeys, false);
+  }
+
+  // call this to Enable
+  function enableScroll() {
+    window.removeEventListener("DOMMouseScroll", preventDefault, false);
+    window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
+    window.removeEventListener("touchmove", preventDefault, wheelOpt);
+    window.removeEventListener("keydown", preventDefaultForScrollKeys, false);
+  }
+
+  return { disableScroll, enableScroll };
+}
