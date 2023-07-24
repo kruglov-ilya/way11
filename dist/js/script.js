@@ -26,20 +26,19 @@ function onProjectsSectionHeadler() {
   const topSectionPositionOfset = 0;
   const pause = 500;
 
-  let scrollIsActive = true;
   let projectNumber = 1;
   let delayStart = Date.now() - pause;
 
   document.addEventListener("scroll", (ev) => {
+    let scrollIsActive = true;
+
     const distanceFromTop = projectsSection.getBoundingClientRect().top;
     if (
       (scrollToDownOfSection(distanceFromTop) && !isFinishState()) ||
       (scrollToTopOfSection(distanceFromTop) && !isStartState())
     ) {
-      unactiveScroll();
-    } else {
-      activeScroll();
-    }
+      scrollIsActive = false;
+    } 
 
     if (!scrollIsActive) {
       scrollToStartSection();
@@ -72,16 +71,6 @@ function onProjectsSectionHeadler() {
 
   function isFinishState() {
     return projectNumber >= 4;
-  }
-
-  function activeScroll() {
-    console.log("Active scroll!");
-    scrollIsActive = true;
-  }
-
-  function unactiveScroll() {
-    console.log("Disable scroll!");
-    scrollIsActive = false;
   }
 
   function pauseIsEnded() {
