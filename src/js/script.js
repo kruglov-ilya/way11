@@ -23,7 +23,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 function onProjectsSectionHeadler() {
   const projectsSection = document.getElementById("projects");
-  const topSectionPosition = 0;
+  const topSectionPositionOfset = 0;
   const pause = 500;
 
   let scrollIsActive = true;
@@ -33,8 +33,8 @@ function onProjectsSectionHeadler() {
   document.addEventListener("scroll", (ev) => {
     const distanceFromTop = projectsSection.getBoundingClientRect().top;
     if (
-      (distanceFromTop < topSectionPosition && !isFinishState()) ||
-      (distanceFromTop > topSectionPosition && !isStartState())
+      (scrollToDownOfSection(distanceFromTop) && !isFinishState()) ||
+      (scrollToTopOfSection(distanceFromTop) && !isStartState())
     ) {
       unactiveScroll();
     } else {
@@ -57,6 +57,14 @@ function onProjectsSectionHeadler() {
       }
     }
   });
+
+  function scrollToDownOfSection(distanceFromTop) {
+    return distanceFromTop < topSectionPositionOfset;
+  }
+
+  function scrollToTopOfSection(distanceFromTop) {
+    return distanceFromTop > topSectionPositionOfset;
+  }
 
   function isStartState() {
     return projectNumber == 0;
