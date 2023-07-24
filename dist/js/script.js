@@ -23,87 +23,81 @@ window.addEventListener("DOMContentLoaded", () => {
 
 function onProjectsSectionHeadler() {
   const projectsSection = document.getElementById("projects");
-  const maxTopForBlock = 0;
+  const topSectionPosition = 0;
+  const pause = 500;
 
-  let scrollActive = true;
-  let projectNumber = 0;
-  let delayState = false;
-
-  const { disableScroll, enableScroll } = getScrollControl();
+  let scrollIsActive = true;
+  let projectNumber = 1;
+  let delayStart = Date.now() - pause;
 
   document.addEventListener("scroll", (ev) => {
     const distanceFromTop = projectsSection.getBoundingClientRect().top;
-    if (distanceFromTop < maxTopForBlock) {
-      if (scrollActive) {
-        scrollActive = false;
-        activeFixedScrollState();
-      }
+    if (
+      (distanceFromTop < topSectionPosition && !isFinishState()) ||
+      (distanceFromTop > topSectionPosition && !isStartState())
+    ) {
+      unactiveScroll();
+    } else {
+      activeScroll();
+    }
 
-      if (!scrollActive && !delayState) {
-        projectNumber++;
-        console.log('Project number:', projectNumber)
-      }
+    if (!scrollIsActive) {
+      scrollToStartSection();
+    }
 
-      console.log("YES! ", distanceFromTop);
+    if (pauseIsEnded()) {
+      startPause();
+
+      if (!scrollIsActive) {
+        if (distanceFromTop > 0) {
+          toPrevProject();
+        } else {
+          toNextProject();
+        }
+      }
     }
   });
 
-  function activeFixedScrollState() {
+  function isStartState() {
+    return projectNumber == 0;
+  }
+
+  function isFinishState() {
+    return projectNumber >= 4;
+  }
+
+  function activeScroll() {
+    console.log("Active scroll!");
+    scrollIsActive = true;
+  }
+
+  function unactiveScroll() {
+    console.log("Disable scroll!");
+    scrollIsActive = false;
+  }
+
+  function pauseIsEnded() {
+    return Date.now() - delayStart > pause;
+  }
+
+  function startPause() {
+    console.log("Start pause");
+    delayStart = Date.now();
+  }
+
+  function toNextProject() {
+    projectNumber++;
+    console.log("To up!");
+    console.log("Project number:", projectNumber);
+  }
+
+  function toPrevProject() {
+    projectNumber--;
+    console.log("To down!");
+    console.log("Project number:", projectNumber);
+  }
+
+  function scrollToStartSection() {
     window.scrollTo(0, projectsSection.offsetTop);
-    disableScroll();
-    console.log("Scroll disabled!");
   }
-}
-
-function getScrollControl() {
-  // left: 37, up: 38, right: 39, down: 40,
-  // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-  var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
-
-  function preventDefault(e) {
-    e.preventDefault();
-  }
-
-  function preventDefaultForScrollKeys(e) {
-    if (keys[e.keyCode]) {
-      preventDefault(e);
-      return false;
-    }
-  }
-
-  // modern Chrome requires { passive: false } when adding event
-  var supportsPassive = false;
-  try {
-    window.addEventListener(
-      "test",
-      null,
-      Object.defineProperty({}, "passive", {
-        get: function () {
-          supportsPassive = true;
-        },
-      })
-    );
-  } catch (e) {}
-
-  var wheelOpt = supportsPassive ? { passive: false } : false;
-  var wheelEvent =
-    "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
-
-  // call this to Disable
-  function disableScroll() {
-    window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
-    window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
-    window.addEventListener("touchmove", preventDefault, wheelOpt); // mobile
-    window.addEventListener("keydown", preventDefaultForScrollKeys, false);
-  }
-
-  // call this to Enable
-  function enableScroll() {
-    window.removeEventListener("DOMMouseScroll", preventDefault, false);
-    window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
-    window.removeEventListener("touchmove", preventDefault, wheelOpt);
-    window.removeEventListener("keydown", preventDefaultForScrollKeys, false);
-  }
-
-  return { disableScroll, enableScroll };
 }
