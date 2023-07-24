@@ -41,7 +41,7 @@ function onProjectsSectionHeadler() {
     } 
 
     if (!scrollIsActive) {
-      scrollToStartSection();
+      scrollToStartOfSection();
     }
 
     if (pauseIsEnded()) {
@@ -94,7 +94,7 @@ function onProjectsSectionHeadler() {
     console.log("Project number:", projectNumber);
   }
 
-  function scrollToStartSection() {
+  function scrollToStartOfSection() {
     window.scrollTo(0, projectsSection.offsetTop);
   }
 }
