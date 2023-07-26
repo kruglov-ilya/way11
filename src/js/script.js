@@ -28,10 +28,10 @@ function onProjectsSectionHeadler(onSwitchProjectCallback) {
 
   const minProjectNumber = 1;
   const maxProjectNumber = 3;
-  let projectNumber = minProjectNumber;
+  let projectNumber = minProjectNumber - 1;
   let delayStart = Date.now() - pause;
 
-  document.addEventListener("scroll", (ev) => {
+  onHeadlerForScroll((ev) => {
     let scrollIsActive = true;
 
     const distanceFromTop = projectsSection.getBoundingClientRect().top;
@@ -40,10 +40,6 @@ function onProjectsSectionHeadler(onSwitchProjectCallback) {
       (scrollToTopOfSection(distanceFromTop) && !isStartState())
     ) {
       scrollIsActive = false;
-    }
-
-    if (!scrollIsActive) {
-      scrollToStartOfSection();
     }
 
     if (pauseIsEnded()) {
@@ -55,6 +51,7 @@ function onProjectsSectionHeadler(onSwitchProjectCallback) {
         } else {
           toNextProject();
         }
+        return false;
       }
     }
   });
@@ -98,10 +95,6 @@ function onProjectsSectionHeadler(onSwitchProjectCallback) {
     console.log("Project number:", projectNumber);
     if (projectNumber >= minProjectNumber)
       onSwitchProjectCallback(projectNumber);
-  }
-
-  function scrollToStartOfSection() {
-    window.scrollTo(0, projectsSection.offsetTop);
   }
 }
 
@@ -156,4 +149,44 @@ function getProjectSwitcher() {
   }
 
   return setActiveProject;
+}
+
+function onHeadlerForScroll(callback) {
+  function preventDefault(e) {
+    if (!callback(e)) {
+      e.preventDefault();
+    }
+  }
+
+  function preventDefaultForScrollKeys(e) {
+    if (keys[e.keyCode]) {
+      if (!callback(e)) {
+        e.preventDefault();
+        return false;
+      }
+    }
+  }
+
+  // modern Chrome requires { passive: false } when adding event
+  var supportsPassive = false;
+  try {
+    window.addEventListener(
+      "test",
+      null,
+      Object.defineProperty({}, "passive", {
+        get: function () {
+          supportsPassive = true;
+        },
+      })
+    );
+  } catch (e) {}
+
+  var wheelOpt = supportsPassive ? { passive: false } : false;
+  var wheelEvent =
+    "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
+
+  window.addEventListener("DOMMouseScroll", preventDefault, false); // older FF
+  window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
+  window.addEventListener("touchmove", preventDefault, wheelOpt); // mobile
+  window.addEventListener("keydown", preventDefaultForScrollKeys, false);
 }
