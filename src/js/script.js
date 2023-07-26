@@ -31,45 +31,81 @@ function onProjectsSectionHeadler(onSwitchProjectCallback) {
   let projectNumber = minProjectNumber - 1;
   let delayStart = Date.now() - pause;
 
-  onHeadlerForScroll((ev) => {
-    let scrollIsActive = true;
-
+  addEventListener("scroll", (e) => {
     const distanceFromTop = projectsSection.getBoundingClientRect().top;
+
     if (
-      (scrollToDownOfSection(distanceFromTop) && !isFinishState()) ||
-      (scrollToTopOfSection(distanceFromTop) && !isStartState())
+      (scrollToDownOfSection(distanceFromTop) &&
+        !isFinishState()) ||
+      (scrollToTopOfSection(distanceFromTop) &&
+        !isStartState()) ||
+      (scrollOnSection(distanceFromTop) && !isStartState() && !isFinishState())
+    ) {
+      scrollToStartOfSection();
+    }
+  });
+
+  onHeadlerForScroll((e) => {
+    let scrollIsActive = true;
+    const deltaScroll = e.deltaY || e.detail || e.wheelDelta;
+    const distanceFromTop = projectsSection.getBoundingClientRect().top;
+
+    if (
+      (scrollToDownOfSection(distanceFromTop - deltaScroll) &&
+        !isFinishState()) ||
+      (scrollToTopOfSection(distanceFromTop - deltaScroll) &&
+        !isStartState()) ||
+      (scrollOnSection(distanceFromTop) && !isStartState() && !isFinishState())
     ) {
       scrollIsActive = false;
     }
 
     if (pauseIsEnded()) {
       startPause();
-
       if (!scrollIsActive) {
-        if (distanceFromTop > 0) {
+        if (deltaScroll < 0) {
           toPrevProject();
         } else {
           toNextProject();
         }
-        return false;
       }
     }
+
+    if (!scrollIsActive) {
+      return false;
+    }
+
+    return true;
   });
 
   function scrollToDownOfSection(distanceFromTop) {
-    return distanceFromTop < topSectionPositionOfset;
+    if (distanceFromTop < topSectionPositionOfset) {
+      return true;
+    } else return false;
   }
 
   function scrollToTopOfSection(distanceFromTop) {
-    return distanceFromTop > topSectionPositionOfset;
+    if (distanceFromTop > topSectionPositionOfset) {
+      return true;
+    } else return false;
+  }
+
+  function scrollOnSection(distanceFromTop) {
+    if (distanceFromTop == topSectionPositionOfset) {
+      return true;
+    } else return false;
   }
 
   function isStartState() {
-    return projectNumber == minProjectNumber - 1;
+    if (projectNumber == minProjectNumber - 1) {
+      return true;
+    } else return false;
   }
 
   function isFinishState() {
-    return projectNumber >= maxProjectNumber + 1;
+    if (projectNumber == maxProjectNumber + 1) {
+      return true;
+    } else return false;
   }
 
   function pauseIsEnded() {
@@ -77,24 +113,25 @@ function onProjectsSectionHeadler(onSwitchProjectCallback) {
   }
 
   function startPause() {
-    console.log("Start pause");
     delayStart = Date.now();
   }
 
   function toNextProject() {
-    projectNumber++;
-    console.log("To up!");
-    console.log("Project number:", projectNumber);
-    if (projectNumber <= maxProjectNumber)
+    if (projectNumber <= maxProjectNumber) {
+      projectNumber++;
       onSwitchProjectCallback(projectNumber);
+    }
   }
 
   function toPrevProject() {
-    projectNumber--;
-    console.log("To down!");
-    console.log("Project number:", projectNumber);
-    if (projectNumber >= minProjectNumber)
+    if (projectNumber >= minProjectNumber) {
+      projectNumber--;
       onSwitchProjectCallback(projectNumber);
+    }
+  }
+
+  function scrollToStartOfSection() {
+    window.scrollTo(0, projectsSection.offsetTop);
   }
 }
 
@@ -152,6 +189,10 @@ function getProjectSwitcher() {
 }
 
 function onHeadlerForScroll(callback) {
+  // left: 37, up: 38, right: 39, down: 40,
+  // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+  var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
+
   function preventDefault(e) {
     if (!callback(e)) {
       e.preventDefault();
