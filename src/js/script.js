@@ -28,7 +28,7 @@ function onProjectsSectionHeadler(onSwitchProjectCallback) {
 
   const minProjectNumber = 1;
   const maxProjectNumber = 3;
-  let projectNumber = minProjectNumber;
+  let projectNumber = minProjectNumber - 1;
   let delayStart = Date.now() - pause;
 
   document.addEventListener("scroll", (ev) => {
