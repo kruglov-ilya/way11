@@ -512,7 +512,6 @@ img {
     &__test {
         position: absolute;
         display: flex;
-        transition: all 0.4s ease;
         &.tr0 {
             transform: translateX(0px);
         }
